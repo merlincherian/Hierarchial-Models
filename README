@@ -1,0 +1,13 @@
+Merlin Cherian
+CS 536
+HW 3- Hierarchical Models
+
+This program, evaluates a hierarchical, robot-like model.
+
+# Specifications
+  - The program is written in Python on Mac and the main executable file is name CG_hw5
+
+# Execution
+
+      Run the Makefile to create the executable and then run the following command:
+      ./CG_hw5 -t -u -v -l -m -n > out.iv

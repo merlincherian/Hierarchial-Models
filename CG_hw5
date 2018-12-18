@@ -1,0 +1,184 @@
+#!/usr/bin/python
+# /*  Name:    Merlin Cherian
+#  *  Class:   CS 536 (Computer Graphics)
+#  *
+#  *
+#  */
+
+import numpy as np
+import math
+from math import radians, degrees
+import argparse
+
+
+def print_model(p1, p2, p3, sp2):
+    print("#Inventor V2.0 ascii\n"
+          "Separator {\n"
+          "Coordinate3 { 	"
+          "\npoint [ ")
+    print("2.000000 2.000000 1.000000,\n"
+	"-2.000000 2.000000 1.000000,\n"
+	"-2.000000 -2.000000 1.000000,\n"
+	"2.000000 -2.000000 1.000000,\n"
+	"2.000000 2.000000 0.000000,\n"
+	"-2.000000 2.000000 0.000000,\n"
+	"-2.000000 -2.000000 0.000000,\n"
+	"2.000000 -2.000000 0.000000")
+    print("]\n}")
+    print_coord_set()
+    print_points(p1)
+    print_points(p2)
+    print_points(p3)
+
+    print ("Separator {\n"
+    "LightModel {\n"
+    "model PHONG\n"
+    "}\n"
+    "Material {\n"
+    "diffuseColor 1.0 1.0 1.0\n" 
+    "}\n"
+    "Sphere {\n"
+        "radius  0.20\n" 
+    "}\n"
+    "}")
+
+    print ("Separator {\n"
+           "LightModel {\n"
+           "model PHONG\n"
+           "}\n"
+           "Material {\n"
+           "diffuseColor 1.0 1.0 1.0\n"
+           "}\n"
+           "Transform {\n"
+           "translation " + str(sp2) + "\n"
+           "}\n"
+           "Sphere {\n"
+           "radius  0.20\n"
+           "}\n"
+           "}")
+
+
+def print_points(P):
+    print("Separator {\n"
+      "Coordinate3 { 	"
+      "\npoint [ ")
+    for i in range(len(P)):
+        print (' '.join(map(repr, P[i])) + ",")
+    print("]\n}")
+    print_coord_set()
+
+
+def print_coord_set():
+    print( "IndexedLineSet {\n"
+          "coordIndex [")
+    coord_set = "0, 1, 2, 0, -1,\n0, 2, 3, 0, -1,\n7, 6, 5, 7, -1,\n7, 5, 4, 7, -1,\n0, 3, 7, 0, -1,\n0, 7, 4, 0, -1,\n1, 5, 6, 1, -1,\n1, 6, 2, 1, -1,\n0, 4, 5, 0, -1,\n0, 5, 1, 0, -1,\n3, 2, 6, 3, -1,\n3, 6, 7, 3, -1"
+    print coord_set
+    print ("]\n}\n}")
+
+
+def translate(l, axis):
+    tx = ty = tz = 0.0
+    if axis == 'x':
+        tx = l
+    if axis == 'y':
+        ty = l
+    if axis == 'z':
+        tz = l
+
+    T = [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [tx, ty, tz, 1.0]]
+    return np.array(T)
+
+
+def modelsIn4D(l):
+    link = [[0.5, 0.5, l, 1], [-0.5, 0.5, l, 1], [-0.5, -0.5, l, 1], [0.5, -0.5, l, 1], [0.5, 0.5, 0, 1], [-0.5, 0.5, 0, 1], [-0.5, -0.5, 0, 1], [0.5, -0.5, 0, 1]]
+    return np.array(link)
+
+
+def models(l):
+    link = [[0.5, 0.5, l], [-0.5, 0.5, l], [-0.5, -0.5, l], [0.5, -0.5, l], [0.5, 0.5, 0], [-0.5, 0.5, 0], [-0.5, -0.5, 0], [0.5, -0.5, 0]]
+    return np.array(link)
+
+
+def rotation(theta, axis):
+    theta  = radians(float(theta))
+    cosT = math.cos(theta)
+    sinT = math.sin(theta)
+
+    if axis == 'x':
+        rotation_matrix = [[1, 0, 0, 0], [0, cosT, sinT, 0], [0, -sinT, cosT, 0], [0, 0, 0, 1]]
+    if axis == 'y':
+        rotation_matrix = [[cosT, 0, -sinT, 0], [0, 1, 0, 0], [sinT, 0, cosT, 0], [0, 0, 0, 1]]
+    if axis == 'z':
+        rotation_matrix = [[cosT, sinT, 0, 0], [-sinT, cosT, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+
+    return np.array(rotation_matrix)
+
+
+def gen_links(P, M):
+    P_ = np.array(np.matmul(P, M))
+    return P_
+
+
+def main():
+    global theta1, theta2, theta3, l1, l2, l3
+    global l0
+    l0 = 1.0
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--t', help='theta1 argument', required=False)
+    parser.add_argument('-u', '--u', help='theta2 argument', required=False)
+    parser.add_argument('-v', '--v', help='theta3 argument', required=False)
+    parser.add_argument('-l', '--l', help='length1 argument', required=False)
+    parser.add_argument('-m', '--m', help='length2 argument', required=False)
+    parser.add_argument('-n', '--n', help='length3 argument', required=False)
+    args = vars(parser.parse_args())
+    if args['t']:
+        theta1 = args['t']
+    else:
+        theta1 = -51
+    if args['u']:
+        theta2 = args['u']
+    else:
+        theta2 = 39
+    if args['v']:
+        theta3 = args['v']
+    else:
+        theta3 = 65
+    if args['l']:
+        l1 = float(args['l'])
+    else:
+        l1 = 4.0
+    if args['m']:
+        l2 = float(args['m'])
+    else:
+        l2 = 3.0
+    if args['n']:
+        l3 = float(args['n'])
+    else:
+        l3 = 2.5
+
+    T = translate(l0, 'z')
+    R = rotation(theta1, 'z')
+    M = T.dot(R)
+    P1 = modelsIn4D(l1)
+    P1_ = gen_links(P1, M)[:,[0,1,2]]
+
+    T = translate(l1, 'z')
+    R = rotation(theta2, 'y')
+    P2 = modelsIn4D(l2)
+    M = np.matmul(R.dot(T), M)
+    P2_ = gen_links(P2, M)[:,[0,1,2]]
+
+    T = translate(l2, 'z')
+    R = rotation(theta3, 'y')
+    P3 = modelsIn4D(l3)
+    M = np.matmul(R.dot(T), M)
+    P3_ = gen_links(P3, M)[:,[0,1,2]]
+
+    sp2 = np.matmul(translate(l3, 'z'), M)[:,[0,1,2]][3]
+    sp2 = (' '.join(map(repr, sp2)))
+
+    print_model(P1_, P2_, P3_, sp2)
+
+
+if __name__ == '__main__':
+    main()
